@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+        src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js"></script>
+    <script src="./tytus.js"></script>
+</head>
+
+<body>
+    <!--
+  This example requires updating your template:
+
+  ```
+  <html class="h-full bg-gray-100">
+  <body class="h-full">
+  ```
+-->
+    <div class="min-h-full">
+        <nav class="bg-gray-800" style="height: 30px;">
+        </nav>
+
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Inteligencia Artificial 1 - Proyecto 2</h1>
+            </div>
+        </header>
+        <main>
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <div class="flex items-center space-x-6 px-4 py-6">
+                    <label class="block">
+                        <span class="sr-only">Cargar Archivo</span>
+                        <input type="file" id="file_dataset" class="block w-full text-sm text-slate-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-gray-50 file:text-gray-700
+                                hover:file:bg-gray-100
+                              " accept=".csv"/>
+                    </label>
+                    <button id="load_file" class="bg-gray-700 rounded-full text-white mr-4 py-2 px-4 hover:bg-gray-500">
+                        Cargar Archivo
+                    </button>
+                </div>
+                <div class="flex space-x-6"  id="container_data">
+                    <div class="basis-1/2">
+                        <div class="relative h-1/4 overflow-x-auto shadow-md sm:rounded-lg" style="max-height: 400px"> 
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="csvTable">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50"></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="model_chart" style="width: 900px; height: 500px"></div>
+                        <div class="relative h-1/4 overflow-x-auto shadow-md sm:rounded-lg" style="max-height: 400px"> 
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="resultTable">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50"></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="basis-1/2">
+                        <div class="max-w-sm mx-auto">
+                            <label for="models" class="block mb-2 text-sm font-medium text-gray-900">Escoja un modelo</label>
+                            <select id="models"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                <option selected value="--"> --- </option>
+                                <option value="rl">Regresión Lineal</option>
+                                <option value="rp">Regresión Polinomial</option>
+                                <option value="ad">Árbol de decisión</option>
+                                <option value="nb">Naive Bayes</option>
+                            </select>
+                            <div id="form_model">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="./index.js"></script>
+</body>
+
+</html>
