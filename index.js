@@ -206,7 +206,20 @@ document.getElementById('models').addEventListener('change', function(){
             }
             break;
         case 'ad':
-            alert('Arbol de Decision')
+            if(headers_data.length>0 && matrix_data.length>0){
+                const form_models = document.getElementById('form_model');
+                form_models.innerHTML = '';
+                form_models.className = 'my-3';
+                
+                const button = document.createElement('button')
+                button.id = 'train_model'
+                button.className = 'bg-gray-700 w-full rounded-full text-white mr-4 py-2 px-4 hover:bg-gray-500'
+                button.textContent = 'Entrenar Modelo'
+
+                button.onclick = train_model
+                form_models.appendChild(button)
+
+            }
             break;
         case 'nb':
             alert('Bayes')
@@ -255,7 +268,51 @@ function train_model(){
 
             break;
         case 'ad':
-            alert('Arbol de Decision')
+            const form_models_ab = document.getElementById('form_model');
+            form_models_ab.className = 'my-3';
+                
+            const h4_title = document.createElement('h4');
+            h4_title.className = 'text-xl font-bold tracking-tight text-gray-900'
+            h4_title.textContent = 'Parámetros'
+
+            form_models_ab.appendChild(h4_title)
+
+            headers_data.forEach((header, index)=>{
+                const container = document.createElement('div');
+                const label = document.createElement('label')
+                label.for = `input_ab_${header.name}`
+                label.className = 'block mb-2 text-sm font-medium text-gray-900'
+                label.textContent = header.name
+
+                const input = document.createElement('input')
+                input.type = 'text'
+                input.id = `input_ab_${header.name}`
+                input.name = `input_ab_${header.name}`
+                input.className = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
+                input.placeholder = header.name
+
+                if(index == headers_data.length-1){
+                    input.disabled = true
+                    input.className = 'bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
+                    input.value = header.name
+                    label.textContent = 'Valor a decidir'
+                    label.for = 'analizar'
+                    input.id = 'analizar'
+                    input.name = 'analizar'
+                }
+                container.appendChild(label)
+                container.appendChild(input)
+                form_models_ab.appendChild(container)
+            })
+
+            const button_ab = document.createElement('button')
+            button_ab.id = 'train_model'
+            button_ab.className = 'bg-gray-700 my-3 w-full rounded-full text-white mr-4 py-2 px-4 hover:bg-gray-500'
+            button_ab.textContent = 'Ver resultados'
+
+            button_ab.onclick = show_graph
+            
+            form_models_ab.appendChild(button_ab)
             break;
         case 'nb':
             alert('Bayes')
@@ -398,7 +455,58 @@ function show_graph(){
 
             break;
         case 'ad':
-            alert('Arbol de Decision')
+            let data_set = [headers_data.map(head => head.name), ...matrix_data];
+            let dTree = new DecisionTreeID3(data_set);
+            console.log(dTree.dataset)
+            let root = dTree.train(dTree.dataset);
+
+            const inputs = document.querySelectorAll('input');
+
+            const values = Array.from(inputs)
+                .filter(input => input.name.startsWith('input_ab_'))
+                .map(input => input.value);
+            
+            let predict_ab = dTree.predict([
+                    headers_data.slice(0, -1).map(head => head.name),
+                    values,
+                ], root)
+            
+            console.log({
+                predictNode: predict_ab
+            })
+
+            const tableHead_ab = document.getElementById('resultTable').querySelector('thead');
+            const tableBody_ab = document.getElementById('resultTable').querySelector('tbody');
+            tableHead_ab.innerHTML = `
+                <tr>
+                    <th scope=\"col\">ID</th>
+                    <th scope=\"col\">TAG</th>
+                    <th scope=\"col\">RESULTADO</th>
+                </tr>`
+            tableBody_ab.innerHTML = `
+            <tr>
+                <th scope=\"col\">${predict_ab.id}</th>
+                <th scope=\"col\">${predict_ab.tag}</th>
+                <th scope=\"col\">${predict_ab.value}</th>
+            </tr>`;
+
+            var parsDot = vis.network.convertDot(dTree.generateDotString(root));
+            var data = {
+                nodes: parsDot.nodes,
+                edges: parsDot.edges
+            }
+            var options = {
+                layout: {
+                    hierarchical: {
+                        levelSeparation: 100,
+                        nodeSpacing: 100,
+                        parentCentralization: true,
+                        direction: 'UD', 
+                        sortMethod: 'directed',                  
+                    },
+                },
+            };
+            var network = new vis.Network(document.getElementById("model_chart"), data, options);
             break;
         case 'nb':
             alert('Bayes')
