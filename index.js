@@ -222,7 +222,20 @@ document.getElementById('models').addEventListener('change', function(){
             }
             break;
         case 'nb':
-            alert('Bayes')
+            if(headers_data.length>0 && matrix_data.length>0){
+                const form_models = document.getElementById('form_model');
+                form_models.innerHTML = '';
+                form_models.className = 'my-3';
+                
+                const button = document.createElement('button')
+                button.id = 'train_model'
+                button.className = 'bg-gray-700 w-full rounded-full text-white mr-4 py-2 px-4 hover:bg-gray-500'
+                button.textContent = 'Entrenar Modelo'
+
+                button.onclick = train_model
+                form_models.appendChild(button)
+
+            }
             break;
         default:
             alert('Modelo no implementado')
@@ -267,6 +280,7 @@ function train_model(){
             form_models.appendChild(button)
 
             break;
+        case 'nb':
         case 'ad':
             const form_models_ab = document.getElementById('form_model');
             form_models_ab.className = 'my-3';
@@ -295,7 +309,7 @@ function train_model(){
                     input.disabled = true
                     input.className = 'bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
                     input.value = header.name
-                    label.textContent = 'Valor a decidir'
+                    label.textContent = select.value == 'ad' ? 'Valor a decidir' : 'Clase a determinar' 
                     label.for = 'analizar'
                     input.id = 'analizar'
                     input.name = 'analizar'
@@ -313,9 +327,6 @@ function train_model(){
             button_ab.onclick = show_graph
             
             form_models_ab.appendChild(button_ab)
-            break;
-        case 'nb':
-            alert('Bayes')
             break;
         default:
             alert('Modelo no implementado')
@@ -509,7 +520,44 @@ function show_graph(){
             var network = new vis.Network(document.getElementById("model_chart"), data, options);
             break;
         case 'nb':
-            alert('Bayes')
+            var bayes = new BayesMethod()   
+            headers_data.forEach((value, index) => {
+                if(index != (headers_data.length-1)){
+                    bayes.addAttribute(matrix_data.map(row=>{
+                        return row.slice(index, index+1)[0]
+                    }), value.name)
+                }else{
+                    bayes.addClass(matrix_data.map(row=>{
+                        return row.slice(index, index+1)[0]
+                    }), 'class')
+                }
+            })
+            bayes.train()
+            const inputs_nb = document.querySelectorAll('input');
+
+            const values_nb = Array.from(inputs_nb)
+                .filter(input => input.name.startsWith('input_ab_'))
+                .map(input => input.value);
+
+            var result = bayes.predict(values_nb)
+            let clase_result = result[0]
+            let probabilidad_result = parseFloat(result[1]).toFixed(2)
+            const tableHead_nb = document.getElementById('resultTable').querySelector('thead');
+            const tableBody_nb = document.getElementById('resultTable').querySelector('tbody');
+            tableHead_nb.innerHTML = `
+                <tr>
+                    <th scope=\"col\">ID</th>
+                    <th scope=\"col\">RESULTADO</th>
+                    <th scope=\"col\">PROBABILIDAD</th>
+                </tr>`
+            tableBody_nb.innerHTML = `
+            <tr>
+                <th scope=\"col\">${2}</th>
+                <th scope=\"col\">${clase_result}</th>
+                <th scope=\"col\">${probabilidad_result}%</th>
+            </tr>`;
+
+            const chart = document.getElementById('model_chart').style = 'display:none;';
             break;
         default:
             alert('Modelo no implementado')
